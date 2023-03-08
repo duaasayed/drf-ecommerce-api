@@ -1,0 +1,17 @@
+<div style="text-align:center">
+    <h2>Activate Your Account</h2>
+
+    <pre>
+        Hi Doaa Sayed,
+
+        To activate your Twilio Account, please verify your email address.
+        Your account will not be created until your email address is confirmed.
+    </pre>
+
+    <button style="padding: 15px; background-color: chocolate; border:none">
+        <a style="text-decoration: none; color:white" href="http://{{ domain }}{% url 'accounts:activate' uidb64=uid token=token %}">
+            Verify your email
+        </a>
+    </button>
+
+</div>
