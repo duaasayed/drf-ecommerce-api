@@ -45,3 +45,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
         customer.is_active = False
         customer.save()
         return customer
+
+
+class AuthUserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return str(obj)
+
+    class Meta:
+        model = Customer
+        fields = [
+            'first_name', 'last_name', 'full_name', 'email',
+            'is_active', 'date_joined', 'last_login'
+        ]

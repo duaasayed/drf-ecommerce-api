@@ -1,4 +1,4 @@
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, AuthUserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,6 +7,11 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken. views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import update_last_login
 
 
 class RegistrationView(APIView):
@@ -51,3 +56,41 @@ class ActivateView(APIView):
 
 
 activate = ActivateView.as_view()
+
+
+class AuthToken(ObtainAuthToken):
+    def get_permissions(self):
+        if self.request.method in ['DELETE']:
+            return [IsAuthenticated()]
+        return super().get_permissions()
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, _ = Token.objects.get_or_create(user=user)
+        update_last_login(None, token.user)
+
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'full_name': str(user)
+        }, status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        request.user.auth_token.delete()
+        return Response({'detail': 'Auth token is expired now. You need to obtain a new token to be used in the subsequent requests.'}, status=status.HTTP_205_RESET_CONTENT)
+
+
+auth_tokens = AuthToken.as_view()
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def auth_user(request):
+    serializer = AuthUserSerializer(request.user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
