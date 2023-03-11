@@ -15,26 +15,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {'is_active': {'read_only': True}}
 
     def validate(self, attrs):
-        if attrs['password1'] != attrs['password2']:
-            raise ValidationError('Passwords do not match')
-
-        password = attrs.get('password1')
-
-        data = {k: v for k, v in attrs.items() if k not in [
-            'password1', 'password2']}
-
-        user = Customer(**data)
-
-        errors = dict()
-        try:
-            validate_password(password=password, user=user)
-
-        except ValidationError as e:
-            errors['password'] = list(e.messages)
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
+        _validate_passwords(attrs)
         return super().validate(attrs)
 
     def create(self, validated_data):
@@ -42,9 +23,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
                     for key in ['password1', 'password2']][0]
         customer = self.Meta.model(**validated_data)
         customer.set_password(password)
-        customer.is_active = False
         customer.save()
         return customer
+
+
+class PasswordSerializer(serializers.Serializer):
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        _validate_passwords(attrs)
+        return super().validate(attrs)
 
 
 class AuthUserSerializer(serializers.ModelSerializer):
@@ -59,3 +48,25 @@ class AuthUserSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'full_name', 'email',
             'is_active', 'date_joined', 'last_login'
         ]
+
+
+def _validate_passwords(attrs):
+    if attrs['password1'] != attrs['password2']:
+        raise ValidationError('Passwords do not match')
+
+    password = attrs.get('password1')
+
+    data = {k: v for k, v in attrs.items() if k not in [
+        'password1', 'password2']}
+
+    user = Customer(**data)
+
+    errors = dict()
+    try:
+        validate_password(password=password, user=user)
+
+    except ValidationError as e:
+        errors['password'] = list(e.messages)
+
+    if errors:
+        raise serializers.ValidationError(errors)
