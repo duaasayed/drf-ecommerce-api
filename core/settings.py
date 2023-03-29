@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "rest_framework.authtoken",
+    "shop"
 ]
 
 MIDDLEWARE = [
