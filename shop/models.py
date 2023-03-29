@@ -12,6 +12,14 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def categories(self):
+        return set([product.category for product in self.products.all()])
+
+    @property
+    def sellers(self):
+        return set([product.seller for product in self.products.all()])
+
 
 class Category(MPTTModel):
     name = models.CharField(max_length=50)

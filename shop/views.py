@@ -1,6 +1,6 @@
-from rest_framework.generics import ListAPIView
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from .models import Category, Product, Brand
+from .serializers import CategorySerializer, ProductSerializer, BrandDetailsSerializer
 from .pagination import ProductsPaginator
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -22,3 +22,10 @@ class ProductsList(ListAPIView):
     search_fields = ['title', 'description']
     ordering_fields = ['published_at', 'price']
     filterset_class = ProductsFilter
+
+
+class BrandDetails(RetrieveAPIView):
+    queryset = Brand.objects.prefetch_related(
+        'products__category', 'products__seller').all()
+    serializer_class = BrandDetailsSerializer
+    lookup_field = 'slug'

@@ -39,3 +39,12 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['title', 'slug', 'description', 'price',
                   'available', 'in_stock', 'seller', 'brand', 'category', 'images']
+
+
+class BrandDetailsSerializer(serializers.ModelSerializer):
+    categories = SubCategorySerializer(many=True)
+    sellers = SellerSerializer(many=True)
+
+    class Meta:
+        model = Brand
+        fields = ['name', 'slug', 'logo', 'categories', 'sellers']
