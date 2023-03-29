@@ -44,11 +44,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "debug_toolbar",
+    "corsheaders",
     "accounts",
     "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -156,4 +158,8 @@ REST_FRAMEWORK = {
 
 INTERNAL_IPS = [
     "127.0.0.1",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    env("CLIENT_HOST")
 ]
