@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework.generics import ListAPIView
+from .models import Category
+from .serializers import CategorySerializer
 
-# Create your views here.
+
+class CategoriesList(ListAPIView):
+    queryset = Category.objects.filter(
+        parent__isnull=True).prefetch_related('subcategories').all()
+    serializer_class = CategorySerializer
