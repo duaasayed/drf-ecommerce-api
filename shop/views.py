@@ -1,6 +1,7 @@
 from rest_framework.generics import ListAPIView
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
+from .pagination import ProductsPaginator
 
 
 class CategoriesList(ListAPIView):
@@ -13,3 +14,4 @@ class ProductsList(ListAPIView):
     queryset = Product.objects.select_related(
         'seller', 'brand', 'category').prefetch_related('images').all()
     serializer_class = ProductSerializer
+    pagination_class = ProductsPaginator
