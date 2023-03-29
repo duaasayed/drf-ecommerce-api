@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     "accounts",
     "rest_framework.authtoken",
     "shop",
-    "mptt"
+    "mptt",
+    "django_filters"
 ]
 
 MIDDLEWARE = [

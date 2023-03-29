@@ -36,6 +36,11 @@ class Category(MPTTModel):
     def __str__(self):
         return self.name
 
+    @property
+    def all_related_products(self):
+        return Product.objects.select_related('brand', 'category', 'seller')\
+            .prefetch_related('images').filter(category__in=self.get_descendants(include_self=True))
+
 
 class Seller(models.Model):
     name = models.CharField(max_length=150)
