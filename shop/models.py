@@ -59,6 +59,14 @@ class Seller(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def categories(self):
+        return set([product.category for product in self.products.all()])
+
+    @property
+    def brands(self):
+        return set([product.brand for product in self.products.all()])
+
 
 class Product(models.Model):
     seller = models.ForeignKey(
