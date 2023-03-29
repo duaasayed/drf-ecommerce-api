@@ -164,3 +164,6 @@ INTERNAL_IPS = [
 CORS_ALLOWED_ORIGINS = [
     env("CLIENT_HOST")
 ]
+
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = 'media/'
