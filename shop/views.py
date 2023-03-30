@@ -5,8 +5,6 @@ from .pagination import ProductsPaginator
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ProductsFilter
-from django.db.models import Prefetch
-from rest_framework.response import Response
 
 
 class CategoriesList(ListAPIView):
@@ -43,4 +41,11 @@ class SellerDetails(RetrieveAPIView):
 class CategoryDetails(RetrieveAPIView):
     queryset = Category.objects.prefetch_related('subcategories').all()
     serializer_class = serializers.CategoryDetailsSerializer
+    lookup_field = 'slug'
+
+
+class ProductDetails(RetrieveAPIView):
+    queryset = Product.objects.select_related(
+        'brand', 'category', 'seller').prefetch_related('images').all()
+    serializer_class = serializers.ProductSerializer
     lookup_field = 'slug'

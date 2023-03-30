@@ -9,5 +9,6 @@ urlpatterns = [
     path('brands/<slug:slug>/', views.BrandDetails.as_view(), name='brand'),
     path('sellers/<slug:slug>/', views.SellerDetails.as_view(), name='seller'),
     path('categories/<slug:slug>/',
-         views.CategoryDetails.as_view(), name='category')
+         views.CategoryDetails.as_view(), name='category'),
+    path('products/<slug:slug>/', views.ProductDetails.as_view(), name='product')
 ]
