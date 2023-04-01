@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     "shop",
     "mptt",
     "django_filters",
-    "carts"
+    "carts",
+    "orders"
 ]
 
 MIDDLEWARE = [
