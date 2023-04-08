@@ -59,3 +59,7 @@ class User(AbstractUser):
     @property
     def is_customer(self):
         return hasattr(self, 'customer')
+
+    @property
+    def is_seller(self):
+        return hasattr(self, 'staff')

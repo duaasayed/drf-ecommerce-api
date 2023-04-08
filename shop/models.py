@@ -1,5 +1,8 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
+from accounts.models.custom_users import Customer
+from accounts.models.base_user import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Brand(models.Model):
@@ -24,7 +27,7 @@ class Brand(models.Model):
 class Category(MPTTModel):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=100, unique=True)
-    parent = TreeForeignKey('self', on_delete=models.CASCADE,
+    parent = TreeForeignKey('self', on_delete=models.SET_NULL,
                             null=True, blank=True, related_name='subcategories')
     image = models.ImageField(upload_to='categories/', null=True, blank=True)
     show_in_nav = models.BooleanField(default=False)
@@ -95,6 +98,10 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def rating(self):
+        self.reviews.aggregate(models.Avg('stars'))
+
 
 def upload_to(instance, filename):
     return f'products/{instance.product.seller.slug}/{instance.product.slug}/{filename}'
@@ -111,3 +118,44 @@ class ProductImage(models.Model):
     @property
     def url(self):
         return self.image.url
+
+
+def get_anonymous_user():
+    user, created = User.objects.get_or_create(
+        first_name='Deleted', last_name='User', email='deleted@user.com')
+    if created:
+        user.set_password('password')
+    return user
+
+
+class Review(models.Model):
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET(get_anonymous_user))
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='reviews')
+    content = models.CharField(max_length=250)
+    stars = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+
+class Question(models.Model):
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET(get_anonymous_user))
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='questions')
+    content = models.CharField(max_length=250)
+
+    @property
+    def answered(self):
+        return self.answers.count() > 0
+
+
+class Answer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET(get_anonymous_user))
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name='answers')
+    content = models.CharField(max_length=250)
+
+    @property
+    def verified(self):
+        return self.user.is_seller and self.user.staff.seller == self.question.product.seller

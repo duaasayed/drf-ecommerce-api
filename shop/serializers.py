@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, Seller, Brand
+from .models import Category, Product, Seller, Brand, Review, Question, Answer
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['title', 'slug', 'description', 'price',
+        fields = ['title', 'slug', 'description', 'price', 'rating',
                   'available', 'in_stock', 'seller', 'brand', 'category', 'images']
 
 
@@ -67,3 +67,46 @@ class CategoryDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['name', 'slug', 'subcategories', 'brands', 'sellers']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='customer', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ['id', 'author', 'content', 'stars']
+
+    def create(self, validated_data):
+        validated_data['product_id'] = self.context['view'].kwargs.get(
+            'product_id')
+        validated_data['customer'] = self.context['request'].user.customer
+        return super().create(validated_data)
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='user', read_only=True)
+
+    class Meta:
+        model = Answer
+        fields = ['id', 'author', 'content', 'verified']
+
+    def create(self, validated_data):
+        validated_data['question_id'] = self.context['view'].kwargs.get(
+            'question_id')
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='customer', read_only=True)
+    answers = AnswerSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'author', 'content', 'answers']
+
+    def create(self, validated_data):
+        validated_data['product_id'] = self.context['view'].kwargs.get(
+            'product_id')
+        validated_data['customer'] = self.context['request'].user.customer
+        return super().create(validated_data)
