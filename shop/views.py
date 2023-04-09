@@ -8,6 +8,7 @@ from .filters import ProductsFilter
 from rest_framework.viewsets import ModelViewSet
 from .permissions import ReviewsPermissions, QuestionsPermissions, AnswersPermissions
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count
 
 
 class CategoriesList(ListAPIView):
@@ -16,9 +17,17 @@ class CategoriesList(ListAPIView):
     serializer_class = serializers.CategorySerializer
 
 
+class BestSellersView(ListAPIView):
+    queryset = Product.objects.select_related('brand', 'category', 'seller')\
+        .prefetch_related('images', 'reviews').annotate(order_count=Count('orderproduct'), reviews_count=Count('reviews'))\
+        .filter(order_count__gt=0).order_by('-order_count')[:10]
+    serializer_class = serializers.ProductSerializer
+
+
 class ProductsList(ListAPIView):
     queryset = Product.objects.select_related(
-        'seller', 'brand', 'category').prefetch_related('images').all()
+        'seller', 'brand', 'category').prefetch_related('images', 'reviews')\
+        .annotate(reviews_count=Count('reviews')).all()
     serializer_class = serializers.ProductSerializer
     pagination_class = ProductsPaginator
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]

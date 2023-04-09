@@ -50,7 +50,8 @@ class Category(MPTTModel):
     @property
     def all_related_products(self):
         return Product.objects.select_related('brand', 'category', 'seller')\
-            .prefetch_related('images').filter(category__in=self.get_descendants(include_self=True))
+            .prefetch_related('images', 'reviews').annotate(reviews_count=models.Count('reviews'))\
+            .filter(category__in=self.get_descendants(include_self=True))
 
     @property
     def brands(self):
@@ -59,6 +60,11 @@ class Category(MPTTModel):
     @property
     def sellers(self):
         return Seller.objects.filter(products__category__in=self.get_descendants(include_self=True)).distinct()
+
+    @property
+    def best_sellers(self):
+        return self.all_related_products.annotate(
+            order_count=models.Count('orderproduct')).filter(order_count__gt=0).order_by('-order_count')[:10]
 
 
 class Seller(models.Model):
@@ -100,7 +106,10 @@ class Product(models.Model):
 
     @property
     def rating(self):
-        self.reviews.aggregate(models.Avg('stars'))
+        total = 0
+        for review in self.reviews.all():
+            total += review.stars
+        return total / self.reviews_count if self.reviews_count > 0 else 0
 
 
 def upload_to(instance, filename):
