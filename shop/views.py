@@ -9,6 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 from .permissions import ReviewsPermissions, QuestionsPermissions, AnswersPermissions
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
+from rest_framework.response import Response
 
 
 class CategoriesList(ListAPIView):
@@ -61,6 +62,15 @@ class ProductDetails(RetrieveAPIView):
         'brand', 'category', 'seller').prefetch_related('images').all()
     serializer_class = serializers.ProductSerializer
     lookup_field = 'slug'
+
+    def retrieve(self, request, *args, **kwargs):
+        obj = self.get_object()
+        serializer = serializers.ProductSerializer(obj)
+        related_products = serializers.ProductSerializer(
+            obj.related_products, many=True)
+        response = {'product': serializer.data,
+                    'related_products': related_products.data}
+        return Response(response)
 
 
 class ReviewViewset(ModelViewSet):

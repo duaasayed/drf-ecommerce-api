@@ -3,6 +3,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 from accounts.models.custom_users import Customer
 from accounts.models.base_user import User
 from django.core.validators import MaxValueValidator, MinValueValidator
+from .services import calc_cosine_similarity
 
 
 class Brand(models.Model):
@@ -111,6 +112,28 @@ class Product(models.Model):
             total += review.stars
         return total / self.reviews_count if self.reviews_count > 0 else 0
 
+    @property
+    def related_products(self):
+        # [seller, brand, category, price]
+        attrs_vector = [1, 1, 1, self.price]
+        other = Product.objects.select_related(
+            'seller', 'brand', 'category').prefetch_related('images', 'reviews').exclude(id=self.id)
+        similarities = []
+        for p in other:
+            p_vector = [0, 0, 0, p.price]
+            if p.seller_id == self.seller_id:
+                p_vector[0] = 1
+            if p.brand_id == self.brand_id:
+                p_vector[1] = 1
+            if p.category_id == self.category_id:
+                p_vector[2] = 1
+
+            sim = calc_cosine_similarity(attrs_vector, p_vector)
+            similarities.append((sim, p))
+
+        similarities.sort(key=lambda x: float(x[0]), reverse=True)
+        return [i[1] for i in similarities][:5]
+
 
 def upload_to(instance, filename):
     return f'products/{instance.product.seller.slug}/{instance.product.slug}/{filename}'
@@ -124,7 +147,7 @@ class ProductImage(models.Model):
     class Meta:
         db_table = 'shop_products_images'
 
-    @property
+    @ property
     def url(self):
         return self.image.url
 
@@ -154,7 +177,7 @@ class Question(models.Model):
         Product, on_delete=models.CASCADE, related_name='questions')
     content = models.CharField(max_length=250)
 
-    @property
+    @ property
     def answered(self):
         return self.answers.count() > 0
 
@@ -165,6 +188,6 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name='answers')
     content = models.CharField(max_length=250)
 
-    @property
+    @ property
     def verified(self):
         return self.user.is_seller and self.user.staff.seller == self.question.product.seller

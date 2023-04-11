@@ -112,3 +112,12 @@ class QuestionSerializer(serializers.ModelSerializer):
             'product_id')
         validated_data['customer'] = self.context['request'].user.customer
         return super().create(validated_data)
+
+
+class RelatedRroductSerializer(serializers.ModelSerializer):
+    images = serializers.SlugRelatedField(
+        slug_field='image', read_only=True, many=True)
+
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'slug', 'price', 'images', 'rating']
