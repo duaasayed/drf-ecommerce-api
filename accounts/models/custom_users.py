@@ -12,15 +12,14 @@ class Customer(UserModel):
         return self.orders.filter(products__id=product).exists()
 
 
-class Staff(UserModel):
-    seller = models.ForeignKey(
-        'shop.Seller', on_delete=models.CASCADE, related_name='staff')
+class StoreRepresentative(UserModel):
+    store = models.ForeignKey(
+        'shop.Store', on_delete=models.CASCADE, related_name='representatives')
     is_admin = models.BooleanField(default=False)
     added_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
 
     class Meta:
-        db_table = 'sellers_staff'
-        verbose_name_plural = 'Staff'
+        db_table = 'store_representatives'
 
     def save(self, *args, **kwargs):
         self.is_staff = True

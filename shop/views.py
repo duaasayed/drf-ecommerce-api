@@ -1,5 +1,5 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .models import Category, Product, Brand, Seller, Review, Question, Answer
+from .models import Category, Product, Brand, Store, Review, Question, Answer
 from . import serializers
 from .pagination import ProductsPaginator
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -19,7 +19,7 @@ class CategoriesList(ListAPIView):
 
 
 class BestSellersView(ListAPIView):
-    queryset = Product.objects.select_related('brand', 'category', 'seller')\
+    queryset = Product.objects.select_related('brand', 'category', 'store')\
         .prefetch_related('images', 'reviews').annotate(order_count=Count('orderproduct'), reviews_count=Count('reviews'))\
         .filter(order_count__gt=0).order_by('-order_count')[:10]
     serializer_class = serializers.ProductSerializer
@@ -27,7 +27,7 @@ class BestSellersView(ListAPIView):
 
 class ProductsList(ListAPIView):
     queryset = Product.objects.select_related(
-        'seller', 'brand', 'category').prefetch_related('images', 'reviews')\
+        'store', 'brand', 'category').prefetch_related('images', 'reviews')\
         .annotate(reviews_count=Count('reviews')).all()
     serializer_class = serializers.ProductSerializer
     pagination_class = ProductsPaginator
@@ -39,15 +39,15 @@ class ProductsList(ListAPIView):
 
 class BrandDetails(RetrieveAPIView):
     queryset = Brand.objects.prefetch_related(
-        'products__category', 'products__seller').all()
+        'products__category', 'products__store').all()
     serializer_class = serializers.BrandDetailsSerializer
     lookup_field = 'slug'
 
 
-class SellerDetails(RetrieveAPIView):
-    queryset = Seller.objects.prefetch_related(
+class StoreDetails(RetrieveAPIView):
+    queryset = Store.objects.prefetch_related(
         'products__category', 'products__brand').all()
-    serializer_class = serializers.SellerDetailsSerializer
+    serializer_class = serializers.StoreDetailsSerializer
     lookup_field = 'slug'
 
 
@@ -59,7 +59,7 @@ class CategoryDetails(RetrieveAPIView):
 
 class ProductDetails(RetrieveAPIView):
     queryset = Product.objects.select_related(
-        'brand', 'category', 'seller').prefetch_related('images').all()
+        'brand', 'category', 'store').prefetch_related('images').all()
     serializer_class = serializers.ProductSerializer
     lookup_field = 'slug'
 

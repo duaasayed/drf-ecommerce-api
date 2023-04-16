@@ -9,7 +9,7 @@ class ProductsFilter(filters.FilterSet):
     category = filters.CharFilter(
         field_name='category__slug', method='filter_category')
     brand = filters.CharFilter(field_name='brand__slug', lookup_expr='exact')
-    seller = filters.CharFilter(field_name='seller__slug', lookup_expr='exact')
+    store = filters.CharFilter(field_name='store__slug', lookup_expr='exact')
 
     def filter_category(self, queryset, name, value):
         category = get_object_or_404(Category, slug=value)
@@ -17,4 +17,4 @@ class ProductsFilter(filters.FilterSet):
 
     class Meta:
         model = Product
-        fields = ['category', 'brand', 'seller', 'price__gt', 'price__lt']
+        fields = ['category', 'brand', 'store', 'price__gt', 'price__lt']

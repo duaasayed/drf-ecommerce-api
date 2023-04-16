@@ -21,8 +21,8 @@ class Brand(models.Model):
         return set([product.category for product in self.products.all()])
 
     @property
-    def sellers(self):
-        return set([product.seller for product in self.products.all()])
+    def stores(self):
+        return set([product.store for product in self.products.all()])
 
 
 class Category(MPTTModel):
@@ -50,7 +50,7 @@ class Category(MPTTModel):
 
     @property
     def all_related_products(self):
-        return Product.objects.select_related('brand', 'category', 'seller')\
+        return Product.objects.select_related('brand', 'category', 'store')\
             .prefetch_related('images', 'reviews').annotate(reviews_count=models.Count('reviews'))\
             .filter(category__in=self.get_descendants(include_self=True))
 
@@ -59,8 +59,8 @@ class Category(MPTTModel):
         return Brand.objects.filter(products__category__in=self.get_descendants(include_self=True)).distinct()
 
     @property
-    def sellers(self):
-        return Seller.objects.filter(products__category__in=self.get_descendants(include_self=True)).distinct()
+    def stores(self):
+        return Store.objects.filter(products__category__in=self.get_descendants(include_self=True)).distinct()
 
     @property
     def best_sellers(self):
@@ -68,7 +68,7 @@ class Category(MPTTModel):
             order_count=models.Count('orderproduct')).filter(order_count__gt=0).order_by('-order_count')[:10]
 
 
-class Seller(models.Model):
+class Store(models.Model):
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=300, unique=True)
     added_at = models.DateTimeField(auto_now_add=True)
@@ -87,8 +87,8 @@ class Seller(models.Model):
 
 
 class Product(models.Model):
-    seller = models.ForeignKey(
-        Seller, on_delete=models.PROTECT, related_name='products')
+    store = models.ForeignKey(
+        Store, on_delete=models.PROTECT, related_name='products')
     brand = models.ForeignKey(
         Brand, on_delete=models.PROTECT, related_name='products')
     category = models.ForeignKey(
@@ -114,14 +114,14 @@ class Product(models.Model):
 
     @property
     def related_products(self):
-        # [seller, brand, category, price]
+        # [store, brand, category, price]
         attrs_vector = [1, 1, 1, self.price]
         other = Product.objects.select_related(
-            'seller', 'brand', 'category').prefetch_related('images', 'reviews').exclude(id=self.id)
+            'store', 'brand', 'category').prefetch_related('images', 'reviews').exclude(id=self.id)
         similarities = []
         for p in other:
             p_vector = [0, 0, 0, p.price]
-            if p.seller_id == self.seller_id:
+            if p.store_id == self.store_id:
                 p_vector[0] = 1
             if p.brand_id == self.brand_id:
                 p_vector[1] = 1
@@ -136,7 +136,7 @@ class Product(models.Model):
 
 
 def upload_to(instance, filename):
-    return f'products/{instance.product.seller.slug}/{instance.product.slug}/{filename}'
+    return f'products/{instance.product.store.slug}/{instance.product.slug}/{filename}'
 
 
 class ProductImage(models.Model):
@@ -190,4 +190,5 @@ class Answer(models.Model):
 
     @ property
     def verified(self):
-        return self.user.is_seller and self.user.staff.seller == self.question.product.seller
+        return self.user.is_store_representative and \
+            self.user.storerepresentative.store == self.question.product.store

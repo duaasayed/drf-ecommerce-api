@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, Seller, Brand, Review, Question, Answer
+from .models import Category, Product, Store, Brand, Review, Question, Answer
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
@@ -16,9 +16,9 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['name', 'slug', 'show_in_nav', 'subcategories']
 
 
-class SellerSerializer(serializers.ModelSerializer):
+class StoreSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Seller
+        model = Store
         fields = ['name', 'slug']
 
 
@@ -29,7 +29,7 @@ class BrandSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    seller = SellerSerializer()
+    store = StoreSerializer()
     brand = BrandSerializer()
     category = SubCategorySerializer()
     images = serializers.SlugRelatedField(
@@ -38,37 +38,37 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['title', 'slug', 'description', 'price', 'rating',
-                  'available', 'in_stock', 'seller', 'brand', 'category', 'images']
+                  'available', 'in_stock', 'store', 'brand', 'category', 'images']
 
 
 class BrandDetailsSerializer(serializers.ModelSerializer):
     categories = SubCategorySerializer(many=True)
-    sellers = SellerSerializer(many=True)
+    stores = StoreSerializer(many=True)
 
     class Meta:
         model = Brand
-        fields = ['name', 'slug', 'logo', 'categories', 'sellers']
+        fields = ['name', 'slug', 'logo', 'categories', 'stores']
 
 
-class SellerDetailsSerializer(serializers.ModelSerializer):
+class StoreDetailsSerializer(serializers.ModelSerializer):
     categories = SubCategorySerializer(many=True)
     brands = BrandSerializer(many=True)
 
     class Meta:
-        model = Seller
+        model = Store
         fields = ['name', 'slug', 'categories', 'brands']
 
 
 class CategoryDetailsSerializer(serializers.ModelSerializer):
     subcategories = SubCategorySerializer(many=True)
     brands = BrandSerializer(many=True)
-    sellers = SellerSerializer(many=True)
+    stores = StoreSerializer(many=True)
     best_sellers = ProductSerializer(many=True)
 
     class Meta:
         model = Category
         fields = ['name', 'slug', 'subcategories',
-                  'brands', 'sellers', 'best_sellers']
+                  'brands', 'stores', 'best_sellers']
 
 
 class ReviewSerializer(serializers.ModelSerializer):

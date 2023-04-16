@@ -31,7 +31,7 @@ class AnswersPermissions(BasePermission):
         if view.action == 'create' and user.is_customer:
             return user.customer.has_purchased(product_id)
         elif view.action == 'create' and user.is_staff:
-            return user.staff.seller == product.seller
+            return user.store_representative.store == product.store
         return True
 
     def has_object_permission(self, request, view, obj):
