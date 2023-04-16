@@ -23,4 +23,5 @@ class StoreRepresentative(UserModel):
 
     def save(self, *args, **kwargs):
         self.is_staff = True
+        self.is_active = True
         super().save(*args, **kwargs)
