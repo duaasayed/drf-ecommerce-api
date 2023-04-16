@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     "django_filters",
     "carts",
     "orders",
-    "profiles"
+    "profiles",
+    "dashboard"
 ]
 
 MIDDLEWARE = [
