@@ -5,6 +5,8 @@ UserModel = get_user_model()
 
 
 class Customer(UserModel):
+    phone = models.CharField(max_length=13)
+    two_fa_enabled = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
     email_verified_at = models.DateTimeField(null=True)
 

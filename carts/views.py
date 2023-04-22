@@ -1,7 +1,7 @@
 from .models import Cart, CartProduct
 from .serializers import ReadCartProductSerializer, WriteCartProductSerializer
 from rest_framework.permissions import IsAuthenticated
-from .permissions import CartPermissions
+from .permissions import IsVerified, CartPermissions
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 class CartProductViewset(ModelViewSet):
     queryset = CartProduct.objects.select_related(
         'cart', 'product').prefetch_related('product__images').all()
-    permission_classes = [IsAuthenticated, CartPermissions]
+    permission_classes = [IsAuthenticated, IsVerified, CartPermissions]
 
     def get_queryset(self):
         auth_user = self.request.user.customer

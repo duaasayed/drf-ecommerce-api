@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "debug_toolbar",
     "corsheaders",
+    'django_otp',
+    'otp_twilio',
     "accounts",
     "rest_framework.authtoken",
     "shop",
@@ -53,7 +55,7 @@ INSTALLED_APPS = [
     "carts",
     "orders",
     "profiles",
-    "dashboard"
+    "dashboard",
 ]
 
 MIDDLEWARE = [
@@ -64,6 +66,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -173,3 +176,9 @@ CORS_ALLOWED_ORIGINS = [
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = 'media/'
+
+OTP_TWILIO_ACCOUNT = env('TWILIO_ACCOUNT_SID')
+OTP_TWILIO_AUTH = env('TWILIO_AUTH_TOKEN')
+OTP_TWILIO_FROM = env('TWILIO_FROM_NUMBER')
+TWILIO_API_KEY = None
+OTP_TWILIO_TOKEN_VALIDITY = 3600
