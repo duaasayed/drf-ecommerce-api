@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from accounts.models.custom_users import StoreRepresentative
-from shop.models import Product, Store
-from orders.models import Order
+from shop.models import Product
+from orders.models import Order, OrderProduct
 from rest_framework.permissions import IsAuthenticated
 from .serializers import ProductSerializer, RepresentativeSerializer, OrderSerializer
 from .permissions import ProductsPermissions, RepresentativesPermissions, OrdersPermissions
@@ -29,11 +29,11 @@ class RepresentativeViewset(ModelViewSet):
 
 
 class OrderViewset(ModelViewSet):
-    queryset = Order.objects.prefetch_related('order_products__product__images',
-                                              'order_products__product__reviews', 'products').all()
+    queryset = OrderProduct.objects.select_related(
+        'order__address', 'product').prefetch_related('product__images', 'product__reviews').all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, OrdersPermissions]
 
     def get_queryset(self):
         store = self.request.user.storerepresentative.store
-        return self.queryset.filter(products__store=store)
+        return self.queryset.filter(product__store=store)

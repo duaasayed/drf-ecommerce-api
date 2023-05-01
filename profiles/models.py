@@ -20,3 +20,6 @@ class AddressBook(models.Model):
     class Meta:
         db_table = 'profiles_address_book'
         verbose_name_plural = 'Address Book'
+
+    def __str__(self):
+        return f'{self.area}, {self.city} - {self.governorate}'

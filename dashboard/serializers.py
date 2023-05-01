@@ -10,7 +10,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['brand', 'category', 'title', 'slug',
+        fields = ['id', 'brand', 'category', 'title', 'slug',
                   'description', 'price', 'in_stock', 'available', 'rating', 'images']
 
     def create(self, validated_data):
@@ -45,18 +45,30 @@ class RepresentativeSerializer(serializers.ModelSerializer):
         return StoreRepresentative.objects.create_user(**validated_data)
 
 
-class OrderProductSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
+    address = serializers.SerializerMethodField()
+    phone = serializers.SerializerMethodField()
+    placed_at = serializers.SerializerMethodField()
+    payment_method = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    def get_address(self, obj):
+        return str(obj.order.address)
+
+    def get_phone(self, obj):
+        return obj.order.address.phone
+
+    def get_placed_at(self, obj):
+        return obj.order.placed_at
+
+    def get_payment_method(self, obj):
+        return obj.order.get_payment_method_display()
+
+    def get_status(self, obj):
+        return obj.get_status_display()
 
     class Meta:
         model = OrderProduct
-        fields = ['product', 'quantity', 'price', 'total_price', 'status']
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    order_products = OrderProductSerializer(many=True)
-
-    class Meta:
-        model = Order
-        fields = ['order_products', 'customer',
-                  'address', 'payment_method', 'placed_at']
+        fields = ['id', 'product', 'quantity', 'price',
+                  'address', 'phone', 'placed_at', 'total_price', 'payment_method', 'status']
