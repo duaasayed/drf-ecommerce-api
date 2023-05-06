@@ -108,7 +108,7 @@ If you have any questions or feedback about the project, please contact us at:
 # References
 This project was inspired by the following articles, papers, or resources:
 
-- Created features inspired by [amazon.eg][https://www.amazon.eg/]
+- Created features inspired by [amazon.eg](https://www.amazon.eg/)
 
 # Disclaimer
 This project is provided as-is and with no warranty or guarantee of fitness for any purpose. Use at your own risk.
