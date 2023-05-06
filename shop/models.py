@@ -4,6 +4,10 @@ from accounts.models.custom_users import Customer
 from accounts.models.base_user import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .services import calc_cosine_similarity
+from datetime import datetime, timedelta
+
+
+one_week_ago = datetime.now() - timedelta(days=7)
 
 
 class Brand(models.Model):
@@ -64,8 +68,15 @@ class Category(MPTTModel):
 
     @property
     def best_sellers(self):
-        return self.all_related_products.annotate(
-            order_count=models.Count('orderproduct')).filter(order_count__gt=0).order_by('-order_count')[:10]
+        return self.all_related_products \
+            .annotate(order_count=models.Count(
+                'orderproduct', filter=models.Q(orderproduct__placed_at__date__gte=one_week_ago.date())))\
+            .filter(order_count__gt=0).order_by('-order_count')[:10]
+
+    @property
+    def new_arrivals(self):
+        return self.all_related_products.filter(added_at__date__gte=one_week_ago.date())\
+            .order_by('-added_at')[:10]
 
 
 class Store(models.Model):
@@ -77,11 +88,11 @@ class Store(models.Model):
     def __str__(self):
         return self.name
 
-    @property
+    @ property
     def categories(self):
         return set([product.category for product in self.products.all()])
 
-    @property
+    @ property
     def brands(self):
         return set([product.brand for product in self.products.all()])
 
@@ -105,14 +116,14 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-    @property
+    @ property
     def rating(self):
         total = 0
         for review in self.reviews.all():
             total += review.stars
         return total / self.reviews_count if self.reviews_count > 0 else 0
 
-    @property
+    @ property
     def related_products(self):
         # [store, brand, category, price]
         attrs_vector = [1, 1, 1, self.price]
@@ -190,5 +201,4 @@ class Answer(models.Model):
 
     @ property
     def verified(self):
-        return self.user.is_store_representative and \
-            self.user.storerepresentative.store == self.question.product.store
+        return self.user.is_store_representative and self.user.storerepresentative.store == self.question.product.store

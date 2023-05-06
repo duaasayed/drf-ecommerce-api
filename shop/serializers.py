@@ -121,3 +121,19 @@ class RelatedRroductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'title', 'slug', 'price', 'images', 'rating']
+
+
+class BestSellersSerializer(serializers.ModelSerializer):
+    best_sellers = ProductSerializer(many=True)
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug', 'best_sellers']
+
+
+class NewArrivalsSerializer(serializers.ModelSerializer):
+    new_arrivals = ProductSerializer(many=True)
+
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug', 'new_arrivals']

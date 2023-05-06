@@ -14,6 +14,7 @@ router.register(r'questions/(?P<question_id>\d+)/answers',
 urlpatterns = [
     path('categories/', views.CategoriesList.as_view(), name='categories'),
     path('best-sellers/', views.BestSellersView.as_view(), name='best_sellers'),
+    path('new-arrivals/', views.NewArrivalsView.as_view(), name='new_arrivals'),
     path('products/', views.ProductsList.as_view(), name='products'),
     path('brands/<slug:slug>/', views.BrandDetails.as_view(), name='brand'),
     path('stores/<slug:slug>/', views.StoreDetails.as_view(), name='store'),
