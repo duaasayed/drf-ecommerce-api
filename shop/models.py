@@ -69,14 +69,12 @@ class Category(MPTTModel):
     @property
     def best_sellers(self):
         return self.all_related_products \
-            .annotate(order_count=models.Count(
-                'orderproduct', filter=models.Q(orderproduct__placed_at__date__gte=one_week_ago.date())))\
+            .annotate(order_count=models.Count('orderproduct'))\
             .filter(order_count__gt=0).order_by('-order_count')[:10]
 
     @property
     def new_arrivals(self):
-        return self.all_related_products.filter(added_at__date__gte=one_week_ago.date())\
-            .order_by('-added_at')[:10]
+        return self.all_related_products.order_by('-added_at')[:10]
 
 
 class Store(models.Model):
