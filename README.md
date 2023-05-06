@@ -24,12 +24,12 @@ To install and run the project, follow these steps:
 
 1. Clone this [repo](https://www.example.com)
 2. In the project dir:
-    - Create a new virtual env: python3 -m venv venv
-    - Activate the virtual env: source venv/bin/activate
-    - Install dependencies: pip install -r requirements.txt
+    - Create a new virtual env: `python3 -m venv venv`
+    - Activate the virtual env: `source venv/bin/activate`
+    - Install dependencies: `pip install -r requirements.txt`
 3. Copy core/.env.example it core/.env and set your config
-4. Run migrations: python3 manage.py migrate
-5. Now you are ready to start running the project: python3 manage.py runserver
+4. Run migrations: `python3 manage.py migrate`
+5. Now you are ready to start running the project: `python3 manage.py runserver`
 
 
 # Features
@@ -99,7 +99,7 @@ The project was built using the following technologies, frameworks, and librarie
 
 # Contact
 If you have any questions or feedback about the project, please contact us at:
-- [e-mail](doaas0213@gmail.com)
+- [E-mail](mailto:doaas0213@gmail.com)
 - [LinkedIn](https://www.linkedin.com/in/douaa-sayed/)
 
 # Authors
@@ -108,7 +108,7 @@ If you have any questions or feedback about the project, please contact us at:
 # References
 This project was inspired by the following articles, papers, or resources:
 
-- Created features inspired by (amazon.eg)[https://www.amazon.eg/]
+- Created features inspired by [amazon.eg][https://www.amazon.eg/]
 
 # Disclaimer
 This project is provided as-is and with no warranty or guarantee of fitness for any purpose. Use at your own risk.
