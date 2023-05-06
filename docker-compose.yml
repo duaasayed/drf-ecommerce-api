@@ -1,0 +1,21 @@
+version: '3.5'
+services:
+  ecommerce:
+    build: .
+    ports:
+      - target: 8000
+        published: 8000
+    networks:
+      - ecommerce-net
+    volumes:
+      - type: volume
+        source: ecommerce-vol
+        target: /myapp
+  nginx:
+    image: nginx
+    networks:
+      - ecommerce-net
+networks:
+  ecommerce-net:
+volumes:
+  ecommerce-vol:
