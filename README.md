@@ -17,12 +17,13 @@ The app is designed to be scalable and customizable, with a modular architecture
 Before running the project, you need to have the following software or tools installed:
 - python
 - pip
+- git
 
 
 ## Installation
 To install and run the project, follow these steps:
 
-1. Clone this [repo](https://www.example.com)
+1. Clone this [repo](https://www.example.com): `git clone https://github.com/duaasayed/drf-ecommerce-api.git`
 2. In the project dir:
     - Create a new virtual env: `python3 -m venv venv`
     - Activate the virtual env: `source venv/bin/activate`
