@@ -64,11 +64,12 @@ class CategoryDetailsSerializer(serializers.ModelSerializer):
     brands = BrandSerializer(many=True)
     stores = StoreSerializer(many=True)
     best_sellers = ProductSerializer(many=True)
+    new_arrivals = ProductSerializer(many=True)
 
     class Meta:
         model = Category
         fields = ['name', 'slug', 'subcategories',
-                  'brands', 'stores', 'best_sellers']
+                  'brands', 'stores', 'best_sellers', 'new_arrivals']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
