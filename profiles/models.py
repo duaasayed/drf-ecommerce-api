@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models.custom_users import Customer
+from shop.models import Product
 
 
 class AddressBook(models.Model):
@@ -30,3 +31,33 @@ class AddressBook(models.Model):
 
     def __str__(self):
         return f'{self.area}, {self.city} - {self.governorate}'
+
+
+class List(models.Model):
+    PRIVACY_STATUS = (
+        ('P', 'Private'),
+        ('S', 'Shared')
+    )
+    customer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, related_name='lists')
+    name = models.CharField(max_length=50)
+    privacy = models.CharField(
+        max_length=1, choices=PRIVACY_STATUS, default='P')
+    description = models.CharField(max_length=250, null=True, blank=True)
+    products = models.ManyToManyField(Product, through='ListProduct')
+
+    def __str__(self):
+        return self.name
+
+
+class ListProduct(models.Model):
+    PRIORITIES = (
+        ('L', 'Low'),
+        ('M', 'Medium'),
+        ('H', 'High')
+    )
+    custom_list = models.ForeignKey(
+        List, on_delete=models.CASCADE, related_name='list_products')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=150, blank=True, null=True)
+    priority = models.CharField(max_length=1, choices=PRIORITIES, default='M')

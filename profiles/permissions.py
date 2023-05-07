@@ -11,9 +11,14 @@ class IsVerified(BasePermission):
         return True
 
 
-class AddressBookPermissions(BasePermission):
+class ProfileOwnerPermissions(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_customer
 
     def has_object_permission(self, request, view, obj):
         return obj.customer == request.user.customer
+
+
+class ListOwnerPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.custom_list.customer == request.user.customer
