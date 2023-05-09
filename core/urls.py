@@ -17,19 +17,26 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path("api-auth/", include('rest_framework.urls')),
-    path("api/", include([
-        path("accounts/", include('accounts.urls')),
-        path("shop/", include('shop.urls')),
-        path("cart/", include('carts.urls')),
-        path("profile/", include('profiles.urls')),
-        path("orders/", include('orders.urls')),
-        path("dashboard/", include('dashboard.urls'))
-    ])),
+]
+
+new_patterns = [
+    path("accounts/", include('accounts.urls')),
+    path("shop/", include('shop.urls')),
+    path("cart/", include('carts.urls')),
+    path("profile/", include('profiles.urls')),
+    path("orders/", include('orders.urls')),
+    path("dashboard/", include('dashboard.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
+
+
+urlpatterns += i18n_patterns(
+    path('api/', include(new_patterns)),
+    path("admin/", admin.site.urls),
+)
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

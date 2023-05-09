@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -182,3 +184,15 @@ OTP_TWILIO_AUTH = env('TWILIO_AUTH_TOKEN')
 OTP_TWILIO_FROM = env('TWILIO_FROM_NUMBER')
 TWILIO_API_KEY = None
 OTP_TWILIO_TOKEN_VALIDITY = 3600
+
+LANGUAGE_CODE = 'en'
+
+
+LANGUAGES = (
+    ('en', 'English'),
+    ('ar', 'Arabic'),
+)
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+
+MODELTRANSLATION_LANGUAGES = ('en', 'ar')
