@@ -1,11 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
 from .models import AddressBook, List, ListProduct
-from .serializers import AddressBookSerializer, ListsSerializer, ListProductSerializer
+from .serializers import AddressBookSerializer, ListsSerializer, ListProductSerializer, CustomerSerializer
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsVerified, ProfileOwnerPermissions, ListOwnerPermission
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from otp_twilio.models import TwilioSMSDevice
 
 
 class AddressBookViewset(ModelViewSet):
@@ -40,3 +40,18 @@ class ListProductViewset(ModelViewSet):
     queryset = ListProduct.objects.all()
     serializer_class = ListProductSerializer
     permission_classes = [IsAuthenticated, IsVerified, ListOwnerPermission]
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsVerified, ProfileOwnerPermissions])
+def manage_2fa(request):
+    customer = request.user.customer
+    two_fa_enabled = request.data.get('enabled')
+    if customer.two_fa_enabled:
+        device = TwilioSMSDevice.objects.get(user=customer)
+        if device.token or device.throttling_failure_count:
+            return Response({'details': 'You do not have permission to perform this action.'})
+    customer.two_fa_enabled = two_fa_enabled
+    customer.save()
+    serializer = CustomerSerializer(customer)
+    return Response(serializer.data)

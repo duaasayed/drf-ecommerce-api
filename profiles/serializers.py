@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import AddressBook, List, ListProduct
 from shop.models import Product
+from accounts.models.custom_users import Customer
 
 
 class AddressBookSerializer(serializers.ModelSerializer):
@@ -46,3 +47,15 @@ class ListProductSerializer(serializers.ModelSerializer):
         if validated_data['product'] not in list_.products.all():
             return super().create(validated_data)
         return ListProduct.objects.get(product=validated_data['product'])
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return str(obj)
+
+    class Meta:
+        model = Customer
+        fields = ['id', 'full_name', 'email',
+                  'two_fa_enabled', 'phone', 'email_verified']
