@@ -10,5 +10,6 @@ router.register(r'list-products', views.ListProductViewset, 'lists_products')
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('manage-2fa/', views.manage_2fa, name='manage_2fa')
+    path('manage-2fa/', views.manage_2fa, name='manage_2fa'),
+    path('change-password/', views.PasswordChange.as_view(), name='change_password'),
 ]

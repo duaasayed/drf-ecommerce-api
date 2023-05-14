@@ -1,16 +1,20 @@
 from rest_framework.viewsets import ModelViewSet
 from .models import AddressBook, List, ListProduct
-from .serializers import AddressBookSerializer, ListsSerializer, ListProductSerializer, CustomerSerializer
+from . import serializers
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsVerified, ProfileOwnerPermissions, ListOwnerPermission
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from otp_twilio.models import TwilioSMSDevice
+from rest_framework.views import APIView
+from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.exceptions import ValidationError
 
 
 class AddressBookViewset(ModelViewSet):
     queryset = AddressBook.objects.all()
-    serializer_class = AddressBookSerializer
+    serializer_class = serializers.AddressBookSerializer
     permission_classes = [IsAuthenticated, IsVerified, ProfileOwnerPermissions]
 
     def get_queryset(self):
@@ -25,20 +29,20 @@ class AddressBookViewset(ModelViewSet):
         address.is_default = True
         address.save()
 
-        serializer = AddressBookSerializer(address)
+        serializer = serializers.AddressBookSerializer(address)
 
         return Response(serializer.data)
 
 
 class ListsViewset(ModelViewSet):
     queryset = List.objects.prefetch_related('products__images').all()
-    serializer_class = ListsSerializer
+    serializer_class = serializers.ListsSerializer
     permission_classes = [IsAuthenticated, IsVerified, ProfileOwnerPermissions]
 
 
 class ListProductViewset(ModelViewSet):
     queryset = ListProduct.objects.all()
-    serializer_class = ListProductSerializer
+    serializer_class = serializers.ListProductSerializer
     permission_classes = [IsAuthenticated, IsVerified, ListOwnerPermission]
 
 
@@ -53,5 +57,36 @@ def manage_2fa(request):
             return Response({'details': 'You do not have permission to perform this action.'})
     customer.two_fa_enabled = two_fa_enabled
     customer.save()
-    serializer = CustomerSerializer(customer)
+    serializer = serializers.CustomerSerializer(customer)
     return Response(serializer.data)
+
+
+class PasswordChange(APIView):
+    permission_classes = [IsAuthenticated, IsVerified, ProfileOwnerPermissions]
+
+    def post(self, request):
+        customer = request.user.customer
+        self.validate_passwords(request.data, customer)
+
+        customer.set_password(request.data.get('password1'))
+        customer.save()
+        return Response({'detail': 'Password Changed Successfully. Login in now.'})
+
+    def validate_passwords(self, attrs, user):
+        if not authenticate(username=user.email, password=attrs.get('current_password')):
+            raise ValidationError('Incorrect Password')
+
+        if attrs['password1'] != attrs['password2']:
+            raise ValidationError('Passwords do not match')
+
+        password = attrs.get('password1')
+
+        errors = dict()
+        try:
+            validate_password(password=password, user=user)
+
+        except Exception as e:
+            errors['password'] = list(e.messages)
+
+        if errors:
+            raise ValidationError(errors['password'])
