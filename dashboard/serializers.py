@@ -1,17 +1,46 @@
 from rest_framework import serializers
-from shop.models import Product
+from shop.models import Product, ProductColor, ProductVariant, ProductSize, ProductSpecification
 from accounts.models.custom_users import StoreRepresentative
 from orders.models import Order, OrderProduct
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductColorSerializer(serializers.ModelSerializer):
     images = serializers.SlugRelatedField(
-        slug_field='image', many=True, read_only=True)
+        slug_field='url', read_only=True, many=True)
+
+    class Meta:
+        model = ProductColor
+        fields = ['id', 'product', 'name', 'images']
+
+
+class ProductVariantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = ['id', 'product', 'color', 'size', 'available', 'in_stock']
+
+
+class ProductSpecsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductSpecification
+        fields = ['id', 'product', 'spec', 'value', 'lookup_field']
+
+
+class ProductSizesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductSize
+        fields = ['id', 'product', 'name']
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    colors = ProductColorSerializer(many=True, read_only=True)
+    sizes = ProductSizesSerializer(many=True, read_only=True)
+    variants = ProductVariantSerializer(many=True, read_only=True)
+    specs = ProductSpecsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'brand', 'category', 'title', 'slug',
-                  'description', 'price', 'in_stock', 'available', 'rating', 'specs', 'images']
+        fields = ['id', 'brand', 'category', 'title', 'title_ar', 'slug', 'slug_ar', 'colors', 'sizes', 'variants',
+                  'description', 'description_ar', 'price', 'available', 'rating', 'specs']
 
     def create(self, validated_data):
         validated_data['store'] = self.context['view'].request.user.storerepresentative.store

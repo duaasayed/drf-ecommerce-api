@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from shop.models import Product
 
 
 class ProductsPermissions(BasePermission):
@@ -14,14 +15,17 @@ class ProductsPermissions(BasePermission):
             return request.user.is_store_representative and \
                 (request.user.has_perm('shop.change_product')
                  or request.user.storerepresentative.is_admin) and \
-                request.user.storerepresentative.store == obj.store
+                request.user.storerepresentative.store == obj.store if isinstance(
+                    obj, Product) else obj.product.store
         elif view.action == 'destroy':
             return request.user.is_store_representative and \
                 (request.user.has_perm('shop.delete_product')
                  or request.user.storerepresentative.is_admin) and \
-                request.user.storerepresentative.store == obj.store
+                request.user.storerepresentative.store == obj.store if isinstance(
+                    obj, Product) else obj.product.store
         return request.user.is_store_representative and \
-            request.user.storerepresentative.store == obj.store
+            request.user.storerepresentative.store == obj.store if isinstance(
+                obj, Product) else obj.product.store
 
 
 class RepresentativesPermissions(BasePermission):

@@ -106,7 +106,6 @@ class Product(models.Model):
     slug = models.SlugField(max_length=600, unique=True)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     available = models.BooleanField(default=True)
-    in_stock = models.IntegerField(null=True)
     description = models.TextField()
     added_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -159,13 +158,47 @@ class ProductSpecification(models.Model):
         super().save(*args, **kwargs)
 
 
+class ProductColor(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='colors')
+    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.product.title} - {self.name}'
+
+
+class ProductSize(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='sizes')
+    name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return f'{self.product.title} - {self.name}'
+
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='variants')
+    color = models.ForeignKey(ProductColor, on_delete=models.CASCADE)
+    size = models.ForeignKey(
+        ProductSize, on_delete=models.CASCADE, null=True, blank=True)
+    available = models.BooleanField()
+    in_stock = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.product.title} - {self.color.name} - {self.size.name}'
+
+
 def upload_to(instance, filename):
-    return f'products/{instance.product.store.slug}/{instance.product.slug}/{filename}'
+    return f'products/{instance.product_color.product.store.slug}/\
+            {instance.product_color.product.slug}/\
+            {instance.product_color.name}/{filename}'
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name='images')
+    product_color = models.ForeignKey(
+        ProductColor, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=upload_to)
 
     class Meta:

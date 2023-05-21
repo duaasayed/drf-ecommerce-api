@@ -14,7 +14,12 @@ class ProductSpecsTranslationOptions(TranslationOptions):
     fields = ('spec', 'value')
 
 
+class ProductColorTranslationOptions(TranslationOptions):
+    fields = ('name', )
+
+
 translator.register(models.Category, CategoryTranslationOptions)
 translator.register(models.Product, ProductTranslationOptions)
 translator.register(models.ProductSpecification,
                     ProductSpecsTranslationOptions)
+translator.register(models.ProductColor, ProductColorTranslationOptions)

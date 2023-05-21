@@ -10,6 +10,8 @@ class ProductsFilter(filters.FilterSet):
         field_name='category__slug', method='filter_category')
     brand = filters.CharFilter(field_name='brand__slug', lookup_expr='exact')
     store = filters.CharFilter(field_name='store__slug', lookup_expr='exact')
+    color = filters.CharFilter(field_name='colors__name', lookup_expr='iexact')
+    size = filters.CharFilter(field_name='sizes__name', lookup_expr='iexact')
 
     def filter_category(self, queryset, name, value):
         category = get_object_or_404(Category, slug=value)

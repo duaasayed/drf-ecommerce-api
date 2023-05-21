@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, Store, Brand, Review, Question, Answer, ProductSpecification
+from .models import Category, Product, Store, Brand, Review, Question, Answer, ProductSpecification, ProductColor, ProductSize, ProductVariant
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
@@ -34,18 +34,38 @@ class ProductSpecification(serializers.ModelSerializer):
         fields = ['id', 'spec', 'value']
 
 
+class ProductColors(serializers.ModelSerializer):
+    images = serializers.SlugRelatedField(
+        slug_field='url', many=True, read_only=True)
+
+    class Meta:
+        model = ProductColor
+        fields = ['id', 'name', 'images']
+
+
+class ProductVariants(serializers.ModelSerializer):
+    color = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    size = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
+    class Meta:
+        model = ProductVariant
+        fields = ['id', 'color', 'size', 'available', 'in_stock']
+
+
 class ProductSerializer(serializers.ModelSerializer):
     store = StoreSerializer()
     brand = BrandSerializer()
     category = SubCategorySerializer()
-    images = serializers.SlugRelatedField(
-        slug_field='url', many=True, read_only=True)
     specs = ProductSpecification(many=True)
+    colors = ProductColors(many=True)
+    sizes = serializers.SlugRelatedField(
+        slug_field='name', read_only=True, many=True)
+    variants = ProductVariants(many=True)
 
     class Meta:
         model = Product
-        fields = ['title', 'slug', 'description', 'price', 'rating', 'specs',
-                  'available', 'in_stock', 'store', 'brand', 'category', 'images']
+        fields = ['title', 'slug', 'description', 'price', 'rating', 'specs', 'sizes', 'variants',
+                  'available', 'store', 'brand', 'category', 'colors']
 
 
 class BrandDetailsSerializer(serializers.ModelSerializer):

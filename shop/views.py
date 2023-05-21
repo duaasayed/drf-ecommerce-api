@@ -30,7 +30,7 @@ class NewArrivalsView(ListAPIView):
 
 class ProductsList(ListAPIView):
     queryset = Product.objects.select_related(
-        'store', 'brand', 'category').prefetch_related('images', 'reviews', 'specs') \
+        'store', 'brand', 'category').prefetch_related('colors__images', 'sizes', 'variants', 'reviews', 'specs') \
         .annotate(reviews_count=Count('reviews')).all()
     serializer_class = serializers.ProductSerializer
     pagination_class = ProductsPaginator
@@ -40,11 +40,12 @@ class ProductsList(ListAPIView):
     filterset_class = ProductsFilter
 
     def get_queryset(self):
+        queryset = None
         for k, v in self.request.query_params.items():
             if k not in self.filterset_class.Meta.fields:
                 queryset = self.queryset.filter(specs__lookup_field=k,
                                                 specs__value__icontains=v)
-        return queryset
+        return queryset if queryset else self.queryset
 
 
 class BrandDetails(RetrieveAPIView):
@@ -69,7 +70,7 @@ class CategoryDetails(RetrieveAPIView):
 
 class ProductDetails(RetrieveAPIView):
     queryset = Product.objects.select_related(
-        'brand', 'category', 'store').prefetch_related('images').all()
+        'brand', 'category', 'store').prefetch_related('colors__images', 'sizes', 'variants').all()
     serializer_class = serializers.ProductSerializer
     lookup_field = 'slug'
 
