@@ -144,6 +144,21 @@ class Product(models.Model):
         return [i[1] for i in similarities][:5]
 
 
+class ProductSpecification(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='specs')
+    spec = models.CharField(max_length=100)
+    value = models.CharField(max_length=250)
+    lookup_field = models.CharField(max_length=200, null=True, editable=False)
+
+    def __str__(self):
+        return f'{self.spec}: {self.value}'
+
+    def save(self, *args, **kwargs):
+        self.lookup_field = '_'.join(self.spec.lower().split(' '))
+        super().save(*args, **kwargs)
+
+
 def upload_to(instance, filename):
     return f'products/{instance.product.store.slug}/{instance.product.slug}/{filename}'
 

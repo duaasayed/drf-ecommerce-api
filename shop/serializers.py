@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, Store, Brand, Review, Question, Answer
+from .models import Category, Product, Store, Brand, Review, Question, Answer, ProductSpecification
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
@@ -28,16 +28,23 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = ['name', 'slug', 'logo']
 
 
+class ProductSpecification(serializers.ModelSerializer):
+    class Meta:
+        model = ProductSpecification
+        fields = ['id', 'spec', 'value']
+
+
 class ProductSerializer(serializers.ModelSerializer):
     store = StoreSerializer()
     brand = BrandSerializer()
     category = SubCategorySerializer()
     images = serializers.SlugRelatedField(
         slug_field='url', many=True, read_only=True)
+    specs = ProductSpecification(many=True)
 
     class Meta:
         model = Product
-        fields = ['title', 'slug', 'description', 'price', 'rating',
+        fields = ['title', 'slug', 'description', 'price', 'rating', 'specs',
                   'available', 'in_stock', 'store', 'brand', 'category', 'images']
 
 

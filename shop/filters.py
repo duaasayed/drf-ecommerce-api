@@ -13,7 +13,7 @@ class ProductsFilter(filters.FilterSet):
 
     def filter_category(self, queryset, name, value):
         category = get_object_or_404(Category, slug=value)
-        return category.all_related_products
+        return queryset.filter(category__in=category.get_descendants(include_self=True))
 
     class Meta:
         model = Product
