@@ -95,7 +95,7 @@ class OrderSerializer(serializers.ModelSerializer):
         return obj.order.get_payment_method_display()
 
     def get_status(self, obj):
-        return obj.get_status_display()
+        return obj.order.get_status_display()
 
     class Meta:
         model = OrderProduct

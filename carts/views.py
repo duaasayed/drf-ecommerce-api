@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 class CartProductViewset(ModelViewSet):
     queryset = CartProduct.objects.select_related(
-        'cart', 'product').prefetch_related('product__images').all()
+        'cart', 'product').prefetch_related('product__colors__images').all()
     permission_classes = [IsAuthenticated, IsVerified, CartPermissions]
 
     def get_queryset(self):
@@ -24,7 +24,7 @@ class CartProductViewset(ModelViewSet):
     def list(self, request, *args, **kwargs):
         auth_user = self.request.user.customer
         cart, _ = Cart.objects.prefetch_related(
-            'cart_products__product__images').get_or_create(customer=auth_user)
+            'cart_products__product__colors__images').get_or_create(customer=auth_user)
         queryset = cart.cart_products.all()
         serializer = self.get_serializer(queryset, many=True)
         response = {'products': serializer.data,

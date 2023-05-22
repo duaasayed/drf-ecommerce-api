@@ -1,0 +1,45 @@
+<div style="text-align:center">
+    <h2>Not long now!</h2>
+
+    <pre>
+        Hello {{customer.first_name}},
+
+        We've got great news. We wanted to let you know that items from your order, have been dispatched.
+
+    </pre>
+
+    <div>
+        <progress value="25" max="100"></progress>
+        <div>
+            <p> <span style="color: green">Shipped: </span> {{shippment_date|date:"M d, Y"}}</p>
+        </div>
+    </div>
+
+    <div style="padding: 15px; background-color: #333">
+        <div style="float:left">
+            <h6>Order Summary</h6>
+            <p><span style="font-weight: bold; margin-right: 10px">Order No</span> {{order.no}}</p> 
+            <a href="http://127.0.0.1:8000/api/orders/{{order.no}}/invoice">View invoice</a>
+        </div>
+
+        <div style="float:right">
+            <h6>SHIPPING ADDRESS</h6>
+            <p><span style="font-weight: bold; margin-right: 10px">{{customer.full_name}}</span></p> 
+            <p>{{order.address}}</p> 
+            <a href="http://127.0.0.1:8000/api/orders/{{order.no}}/track">Track this order</a>
+        </div>
+    </div>
+
+    <div>
+        <pre>
+            We'll let you know when your order is on its way to you so you can really get excited about it.
+
+            We’re doing everything we can to ensure you get your order safely by:
+
+            Sanitizing our facilities
+            Monitoring hygiene
+            Providing contactless payment options
+            Until then, stay safe at home while we deliver to you.
+        </pre>
+    </div>
+</div>

@@ -4,12 +4,9 @@ from shop.models import Product
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    images = serializers.SlugRelatedField(
-        slug_field='url', many=True, read_only=True)
-
     class Meta:
         model = Product
-        fields = ['id', 'title', 'price', 'images', 'available', 'in_stock']
+        fields = ['id', 'title', 'price', 'available']
 
 
 class ReadCartProductSerializer(serializers.ModelSerializer):

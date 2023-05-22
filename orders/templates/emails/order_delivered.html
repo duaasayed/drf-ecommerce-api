@@ -1,0 +1,45 @@
+<div style="text-align:center">
+    <h2>Great News!</h2>
+
+    <pre>
+        Hello {{customer.first_name}},
+
+        Your order has been delivered. We hope you enjoy your purchase. Click on the review button below to let our sellers know how they can deliver better products and services.
+
+    </pre>
+
+    <div>
+        <progress value="100" max="100"></progress>
+        <div>
+            <p> <span style="color: green">Delivered </span><p>
+        </div>
+    </div>
+
+    <div style="padding: 15px; background-color: #333">
+        <div style="float:left">
+            <h6>Order Summary</h6>
+            <p><span style="font-weight: bold; margin-right: 10px">Order No</span> {{order.no}}</p> 
+            <p><span style="font-weight: bold; margin-right: 10px">Order Total</span> {{order.total}}</p> 
+            <p><span style="font-weight: bold; margin-right: 10px">Payment</span> {{order.payment}}</p> 
+        </div>
+
+        <div style="float:right">
+            <h6>SHIPPING ADDRESS</h6>
+            <p><span style="font-weight: bold; margin-right: 10px">{{customer.full_name}}</span></p> 
+            <p>{{order.address}}</p> 
+        </div>
+    </div>
+
+    <div>
+        <pre>
+            We'll let you know when your order is on its way to you so you can really get excited about it.
+
+            We’re doing everything we can to ensure you get your order safely by:
+
+            Sanitizing our facilities
+            Monitoring hygiene
+            Providing contactless payment options
+            Until then, stay safe at home while we deliver to you.
+        </pre>
+    </div>
+</div>
